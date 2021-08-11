@@ -379,6 +379,27 @@ class TestTransforms(unittest.TestCase):
         self.assertTrue(tt.ft(X.sample(K)) == rhs_sum.extent(N//K))
         self.assertTrue(tt.ft(lhs_sum.extent(N//K)/K) == A.sample(K))
 
+    def test_sampling_determination(self):
+        '''
+        X, A is a transform pair and A is 0 from n>=N/K onward.
+        Then we can reconstruct X from a sampling of X:
+
+        X(j) = sum_{l=0}^{N/K - 1} sample(X,K) * G(j - l*K)
+
+        '''
+        N = 30
+        K = 6
+        t = Transform(N)
+        A = random_periodic_seq(N)
+        for k in range(N//K, N): 
+            A[k] = 0
+        X = t.ift(A)
+        rhs = PSeq([0]*N)
+        for j in range(0, N):
+            rhs[j] = sum([X.sample(K)[l] * G(N, K, j - l*K) 
+                          for l in range(0, N//K)])
+        self.assertTrue(X == rhs)
+
 
 class TestSpecialSequencesAndFunctions(unittest.TestCase):
 
