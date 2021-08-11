@@ -107,12 +107,12 @@ class PeriodicSequence:
         is of length N/K.
 
         '''
-        sampled = PSeq([0]*self._N//K)
-        if not N % K == 0:
+        sampled = PSeq([0]*(self._N//K))
+        if not self._N % K == 0:
             raise ValueError('K={} does not divide N={}.'
-                             .format(K, self.N()))
+                             .format(K, self._N))
         else:
-            for j in range(0, N//K):
+            for j in range(0, self._N//K):
                 sampled._V[j] = self._V[j*K]
         return sampled
 

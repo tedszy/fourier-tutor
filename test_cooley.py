@@ -1,7 +1,7 @@
-# test_pe.py
+# test_cooley.py
 #
-# These tests are all properties of the DFT 
-# taken from the Cooley paper.
+# These tests are based properties of the DFT 
+# and theorems taken presented in the Cooley paper.
 
 import unittest
 from cooley import *
@@ -95,7 +95,6 @@ class TestSequences(unittest.TestCase):
         Z = another_even_periodic_seq(N)
         self.assertTrue(X.lagged_product(Y) == X.convolution(Y))
         self.assertTrue(Y.lagged_product(Z) == Z.lagged_product(Y))
-
 
 
 class TestTransforms(unittest.TestCase):
@@ -358,8 +357,27 @@ class TestTransforms(unittest.TestCase):
         self.assertTrue(tt.ft(X.stretch(K)) == (1/K)*A.extent(N*K))
         self.assertTrue(tt.ft(X.extent(N*K)) == A.stretch(K))
 
+    def test_sample_relation(self):
+        '''
+        If X, A are transform pairs then
+        sample(X,K), leftshift(A,0*N/K)+...+leftshift(A,(K-1)N/K)
+        are transform pairs when considered as N/K length sequences.
 
+        Likewise if X, A are transform pairs then
+        (1/K)*(leftshift(X,0*N/K)+ ...), sample(A,K) 
+        are trasform pairs of length N/K.
 
+        '''
+        N = 30
+        K = 6
+        t = Transform(N)
+        tt = Transform(N//K)
+        X = random_periodic_seq(N)
+        A = t.ft(X)
+        rhs_sum = sum([A.shift_left(m*N//K) for m in range(0,K)])
+        lhs_sum = sum([X.shift_left(m*N//K) for m in range(0,K)])
+        self.assertTrue(tt.ft(X.sample(K)) == rhs_sum.extent(N//K))
+        self.assertTrue(tt.ft(lhs_sum.extent(N//K)/K) == A.sample(K))
 
 
 class TestSpecialSequences(unittest.TestCase):
@@ -388,9 +406,7 @@ class TestSpecialSequences(unittest.TestCase):
         self.assertTrue(t.ft(X-a) == t.ft(X) - a*dirac_seq(N))
 
 
-
-
 if __name__ == '__main__': 
     unittest.main(verbosity=1)
-    
+
     
