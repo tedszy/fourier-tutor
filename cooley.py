@@ -1,7 +1,6 @@
 # cooley.py
 #
 # Periodic sequences and discrete Fourier transform.
-#
 
 from math import sin, cos, pi
 import numpy as np
@@ -115,13 +114,6 @@ class PeriodicSequence:
             for j in range(0, self._N//K):
                 sampled._V[j] = self._V[j*K]
         return sampled
-
-
-
-
-
-
-    
 
     def convolution(self, other):
         '''
@@ -318,4 +310,32 @@ class Transform:
     
     def __repr__(self):
         return f'Transform({self._N})'
+
+# the G function.
+
+def G(N, K, j):
+    '''
+    The function called G in the Cooley paper.
+
+    G(N, K, j) = 1 if j = 0 mod N.
+    G(N, K, j) = (K/N) * (1 - w_K^j)/(1 - w_N^j) otherwise.
+
+    We also have 
+
+    G(N, K, J) = (K/N) sum_{n=0}^{N/K - 1} w_N^{n*j}.
+
+    To do: 
+        should we check if K divides N?
+
+    '''
+    wN = np.exp(2*pi*1j/N)
+    wK = np.exp(2*pi*1j/K)
+    if j % N == 0:
+        return 1
+    else:
+        return (K/N) * (1 - wK**j) / (1 - wN**j)
+
+
+
+
 

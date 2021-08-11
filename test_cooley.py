@@ -380,7 +380,7 @@ class TestTransforms(unittest.TestCase):
         self.assertTrue(tt.ft(lhs_sum.extent(N//K)/K) == A.sample(K))
 
 
-class TestSpecialSequences(unittest.TestCase):
+class TestSpecialSequencesAndFunctions(unittest.TestCase):
 
     def test_dirac(self):
         '''
@@ -405,6 +405,20 @@ class TestSpecialSequences(unittest.TestCase):
         self.assertTrue(t.ft(X+a) == t.ft(X) + a*dirac_seq(N))
         self.assertTrue(t.ft(X-a) == t.ft(X) - a*dirac_seq(N))
 
+    def test_G(self):
+        '''
+        G(N,K,j) must satisfy the identity
+        
+        G(N, K, J) = (K/N) sum_{n=0}^{N/K - 1} w_N^{n*j}.
+
+        '''
+        N = 30
+        K = 6
+        j = 13
+        wN = np.exp(2*pi*1j/N)
+        rhs = (K/N) * sum([wN**(n*j) for n in range(0, N//K)])
+        self.assertTrue(np.isclose(G(N,K,j), rhs))
+        
 
 if __name__ == '__main__': 
     unittest.main(verbosity=1)
